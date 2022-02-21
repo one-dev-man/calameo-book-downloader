@@ -2,7 +2,8 @@
   "name": "calameo-book-downloader",
   "version": "0.0.1",
   "description": "",
-  "main": "index.js",
+  "main": "./dist/main.js",
+  "bin": "./dist/main.js",
   "scripts": {
     "build": "del .\\dist /S /Q && tsc --build && cd src && copyfiles -e=\"./**/*.ts\" \"./**/*\" \"../dist/src/\" && cd ../",
     "test": "node ./dist/test/test",

@@ -11,10 +11,10 @@ This projet is a simple book downloader from Calameo platform using the Calameo 
 First, install it in general with `npm i -g cbdl`
 
 And now you can use it in your terminal :
-```batch
+```bash
 > cbdl help
 ```
-```batch
+```bash
 > cbdl dl <url|book_code> <output_file>
 ```
 

@@ -417,10 +417,14 @@ class CLI extends listener_class_1.Listener {
         };
         let cmd_env = this.argv;
         if (this.argv.indexes() > 1) {
+            console.log(cmd_env.keys());
+            console.log(cmd_env.get());
             cmd_info.args = cmd_env.get();
             cmd_info.args.shift();
+            console.log(cmd_info.args);
             cmd_info.label = cmd_info.args.shift();
-            let success = await this.runCommand(cmd_info.label, ...cmd_info.args);
+            console.log(cmd_info.args);
+            let success = await this.runCommand(cmd_info.label, cmd_info.args);
             !success ? await this.runCommand("help", cmd_info.label) : null;
         }
         else {
@@ -439,7 +443,7 @@ class CLI extends listener_class_1.Listener {
         this.bindConsole();
         readline.emitKeypressEvents(this.input);
         this.input.setRawMode(true);
-        this.input.on("keypress", __classPrivateFieldGet(this, _CLI_live_stdin_data_callback, "f"));
+        this.input.on("keypress", this.live_stdin_data_callback);
         __classPrivateFieldGet(this, _CLI_startup_message, "f").length > 0 ? console.log(__classPrivateFieldGet(this, _CLI_startup_message, "f")) : null;
         __classPrivateFieldSet(this, _CLI_closed, false, "f");
         __classPrivateFieldGet(this, _CLI_print_compiled_prompt, "f").call(this);
@@ -449,7 +453,7 @@ class CLI extends listener_class_1.Listener {
         this.output["write"] = this.output["__write"];
         this.output["__write"] = undefined;
         this.unbindConsole();
-        this.input.removeListener("keypress", __classPrivateFieldGet(this, _CLI_live_stdin_data_callback, "f"));
+        this.input.removeListener("keypress", this.live_stdin_data_callback);
         this.input.setRawMode(false);
     }
     //

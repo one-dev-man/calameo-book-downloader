@@ -2,17 +2,27 @@ import * as fs from "fs";
 import * as path from "path";
 
 import * as pdfkit from "pdfkit";
+import * as admZip from "adm-zip";
 
 import CalameoAPI from "../calameo/api";
 import { CLI, CLI_COMMAND_CONSTRUCTOR_TYPE } from "../cli/cli";
 import Await from "../utils/await";
 
+const BOOK_FORMAT = {
+    PDF: "PDF",
+    ZIP: "ZIP"
+}
+
 export const download_command: CLI_COMMAND_CONSTRUCTOR_TYPE = {
     label: "download",
-    help: "dl <url|book_code> <output_file>",
+    help: "dl <url|book_code> <output_file> [--format=<zip|pdf>]",
     callback: async (label: string, args: Array<any>, cli: CLI) => {
-        let book_code = null;
         if(args.length > 1) {
+            let book_code = null;
+
+            let format = BOOK_FORMAT[( args["format"]+"" || "pdf" ).toUpperCase()];
+            let output_file_path = args[1]+"";
+            
             try {
                 let url = new URL(args[0]);
                 console.log(url.pathname);
@@ -74,18 +84,30 @@ export const download_command: CLI_COMMAND_CONSTRUCTOR_TYPE = {
                     process.exit(0);
                 }
 
-                console.info("")
+                console.info("Converting book pages to "+format+" file \""+output_file_path+"\"...")
 
-                let pdf_doc = new pdfkit.default();
+                if(format == BOOK_FORMAT.PDF) {
+                    let pdf_doc = new pdfkit.default();
 
-                pdf_doc.pipe(fs.createWriteStream(path.join(args[1]+"")));
+                    pdf_doc.pipe(fs.createWriteStream(path.join(output_file_path)));
 
-                for(let i = 1; i < page_count+1; ++i) {
-                    let page_file_path = path.join(book_pages_dir_path, "/p"+i+".jpg");
-                    pdf_doc.addPage({ margins: { top: 0, bottom: 0, left: 0, right: 0 },  }).image(page_file_path, { width: parseInt(book_info.content.document.width), height: parseInt(book_info.content.document.height), align: "center", valign: "center" });
+                    for(let i = 1; i < page_count+1; ++i) {
+                        let page_file_path = path.join(book_pages_dir_path, "/p"+i+".jpg");
+                        pdf_doc.addPage({ margins: { top: 0, bottom: 0, left: 0, right: 0 },  }).image(page_file_path, { width: parseInt(book_info.content.document.width), height: parseInt(book_info.content.document.height), align: "center", valign: "center" });
+                    }
+
+                    pdf_doc.end();
                 }
+                else if(format == BOOK_FORMAT.ZIP) {
+                    let zip_file = new admZip.default();
+                    
+                    for(let i = 1; i < page_count+1; ++i) {
+                        let page_file_path = path.join(book_pages_dir_path, "/p"+i+".jpg");
+                        zip_file.addLocalFile(page_file_path);
+                    }
 
-                pdf_doc.end();
+                    fs.writeFileSync(output_file_path, zip_file.toBuffer());
+                }
             }
             return true;
         }

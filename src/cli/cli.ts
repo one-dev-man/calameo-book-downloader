@@ -461,7 +461,7 @@ export class CLI extends Listener {
             cmd_info.args.shift();
             cmd_info.label = cmd_info.args.shift() as string;
 
-            let success = await this.runCommand(cmd_info.label, ...cmd_info.args);
+            let success = await this.runCommand(cmd_info.label, cmd_info.args);
             !success ? await this.runCommand("help", cmd_info.label) : null;
         }
         else {
@@ -485,7 +485,7 @@ export class CLI extends Listener {
 
         readline.emitKeypressEvents(this.input);
         this.input.setRawMode(true);
-        this.input.on("keypress", this.#live_stdin_data_callback);
+        this.input.on("keypress", this.live_stdin_data_callback);
         this.#startup_message.length > 0 ? console.log(this.#startup_message) : null;
 
         this.#closed = false;
@@ -501,7 +501,7 @@ export class CLI extends Listener {
 
         this.unbindConsole();
 
-        this.input.removeListener("keypress", this.#live_stdin_data_callback);
+        this.input.removeListener("keypress", this.live_stdin_data_callback);
         this.input.setRawMode(false);
     }
 

@@ -15,7 +15,7 @@ And now you can use it in your terminal :
 > cbdl help
 ```
 ```bash
-> cbdl dl <url|book_code> <output_file>
+> cbdl download|dl <url|book_code> <output_file>
 ```
 
 ### As a dependecy :
